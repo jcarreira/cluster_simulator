@@ -1,0 +1,4 @@
+class Job {
+public:
+private:
+};
