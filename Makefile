@@ -1,5 +1,8 @@
+SOURCES = Task.cpp Job.cpp Scheduler.cpp Event.cpp Cluster.cpp Node.cpp
+CFLAGS  = --std=c++14 -ggdb -Wall
+
 all:
-	g++ --std=c++14 main.cpp Task.cpp Job.cpp Scheduler.cpp Event.cpp -o simulator
+	g++ $(CFLAGS) main.cpp $(SOURCES) -o simulator
 
 clean:
 	rm -rf simulator
