@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "Event.h"
-#include "Scheduler.h"
+#include "ReplicateScheduler.h"
 #include "Cluster.h"
 #include "Log.h"
 
@@ -73,7 +73,7 @@ void add_to_queue(std::shared_ptr<Event> event) {
 
 int main() {
     auto cluster = createCluster();
-    scheduler = std::make_shared<Scheduler>(cluster);
+    scheduler = std::make_shared<ReplicateScheduler>(cluster);
     auto jobs = createJobs(scheduler);
 
     //scheduler.start(cluster, jobs);

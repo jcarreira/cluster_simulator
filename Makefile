@@ -1,4 +1,4 @@
-SOURCES = Task.cpp Job.cpp Scheduler.cpp Event.cpp Cluster.cpp Node.cpp
+SOURCES = Task.cpp Job.cpp Scheduler.cpp Event.cpp Cluster.cpp Node.cpp ReplicateScheduler.cpp MigrateScheduler.cpp
 CFLAGS  = --std=c++17 -ggdb -Wall
 
 all:
