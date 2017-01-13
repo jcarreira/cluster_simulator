@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 namespace simulator {
 
@@ -17,11 +18,23 @@ using JobId = uint64_t;
 class Job {
 public:
     Job(Time, JobId, std::vector<TaskPtr>);
+
+    void addTask(TaskPtr task);
+
+    std::ostream& operator<<(std::ostream& os) const {
+        os << "Job time" << std::endl;
+        return os;
+    }
+
+public:
    
     Time time_;
     std::vector<TaskPtr> tasks_;
     JobId job_id_;
+
 };
+
+std::ostream& operator<<(std::ostream&, const Job&);
 
 }
 

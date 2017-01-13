@@ -83,7 +83,7 @@ class CheckStragglersEvent : public Event {
 public:
     CheckStragglersEvent(Time);
     void process() override final;
-    std::string getType() const override final { return "NodeDownEvent"; }
+    std::string getType() const override final { return "CheckStragglersEvent"; }
 };
 
 struct EventComparator {

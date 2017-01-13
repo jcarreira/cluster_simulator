@@ -1,10 +1,12 @@
 #include "Event.h"
 #include "Log.h"
 #include "Scheduler.h"
-#include <random>
 
 extern void add_to_queue(std::shared_ptr<simulator::Event> event);
 extern simulator::SchedPtr scheduler;
+extern const double STRAGGLER_TIME;
+
+#define CHECK_STRAGGLERS 1
 
 // 1 ms
 static const double TIME_TO_INFORM_SCHEDULER = 0.001;
@@ -17,31 +19,12 @@ Event::Event(Time t) :
 ScheduleJobEvent::ScheduleJobEvent(Time time, JobPtr j, SchedPtr sch) :
     Event(time),
     job(j), scheduler(sch)
-    { }
-
-
-void deploy_task(ClusterPtr cluster, TaskPtr task) {
-
-    uint64_t location = task->data_location_;
-    
-    LOG<INFO>("Deploying task id: ", task->task_id_,
-            " location: ", location);
-
-    cluster->nodes_[location]->deploy_task(task);
-}
-
+{ }
 
 void ScheduleJobEvent::process() {
-    LOG<INFO>("Processing ScheduleJobEvent");
+    LOG<INFO>("ScheduleJobEvent::process");
 
-    auto cluster = scheduler->cluster_;
-
-    auto tasks = job->tasks_;
-
-    LOG<INFO>("Deploying ", tasks.size(), " tasks");
-    for (auto task: tasks) {
-        deploy_task(cluster, task);
-    }    
+    scheduler->scheduleJob(job);
 }
 
 StartTaskEvent::StartTaskEvent(Time time, TaskPtr task) :
@@ -50,16 +33,13 @@ StartTaskEvent::StartTaskEvent(Time time, TaskPtr task) :
 {}
 
 void StartTaskEvent::process() {
-    LOG<INFO>("Processing StartTaskEvent");
+    LOG<INFO>("StartTaskEvent::process");
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_real_distribution<> dis(10, 50);
-    task_->task_completion_time = dis(gen);
+    Time taskCompletionTime = task_->getTaskCompletionTime();
 
     // task is finishing
     add_to_queue(std::make_shared<EndTaskEvent>(
-                current_time + task_->task_completion_time,
+                current_time + taskCompletionTime,
                 task_));
 }
 
@@ -69,9 +49,12 @@ EndTaskEvent::EndTaskEvent(Time time, TaskPtr task) :
 {}
 
 void EndTaskEvent::process() {
-    LOG<INFO>("Processing EndTaskEvent");
+    LOG<INFO>("EndTaskEvent::process");
+    LOG<INFO>("task id: ", task_->task_id_);
 
     // inform scheduler
+    task_->done_ = true;
+
     add_to_queue(std::make_shared<EndTaskSchedulerEvent>(
                 current_time + TIME_TO_INFORM_SCHEDULER,
                 task_));
@@ -80,18 +63,22 @@ void EndTaskEvent::process() {
 EndTaskSchedulerEvent::EndTaskSchedulerEvent(Time time, TaskPtr task) :
     Event(time),
     task_(task)
-{}
+{ }
 
 void EndTaskSchedulerEvent::process() {
-    LOG<INFO>("Processing EndTaskSchedulerEvent");
+    LOG<INFO>("EndTaskSchedulerEvent::process");
 
     auto jobid = task_->jobId;
-    scheduler->completeTask(jobid);
 
-    auto n_tasks = scheduler->numTasks_[jobid];
+    if (task_->replicated_ == true) {
+        LOG<INFO>("Killing clone");
+        scheduler->completeTask(jobid, task_->clone);
+    }
 
-    if (scheduler->jobCompletedTasks_[jobid] >= n_tasks) {
-        LOG<INFO>("Job done");
+    scheduler->completeTask(jobid, task_);
+
+    if (scheduler->isJobDone(jobid)) {
+        LOG<INFO>("process Job done");
     }
 }
 
@@ -100,8 +87,25 @@ CheckStragglersEvent::CheckStragglersEvent(Time time) :
 { }
 
 void CheckStragglersEvent::process() {
-    LOG<INFO>("Processing CheckStragglersEvent");
+    LOG<INFO>("CheckStragglersEvent::process");
 
+    if (CHECK_STRAGGLERS) {
+        // check all jobs
+        scheduler->checkStragglers();
+    } else {
+
+    }
+
+    LOG<INFO>("NumActiveJobs: ", scheduler->getNumActiveJobs());
+    if (scheduler->getNumActiveJobs()) {
+        add_to_queue(std::make_shared<CheckStragglersEvent>(
+                    current_time + STRAGGLER_TIME));
+    }
+}
+
+void NodeDownEvent::process() {
+    LOG<INFO>("NodeDownEvent::process");
 }
 
 } // namespace simulator
+

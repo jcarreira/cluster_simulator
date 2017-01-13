@@ -35,7 +35,7 @@ bool LOG(Params&& ... param) {
     };
 
     // print timestamp
-    std::cout << current_time << " ";
+    std::cout << current_time << "\t";
 
  __attribute__((unused))
     int dummy[] = { 0, ( (void) f(std::forward<Params>(param)), 0) ... }; 

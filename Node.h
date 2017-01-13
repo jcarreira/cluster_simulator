@@ -16,7 +16,8 @@ class Node {
 public:
     Node(uint64_t);
 
-    void deploy_task(TaskPtr task);
+    void deployTask(TaskPtr task);
+    void removeTask(TaskPtr task);
 
 private:
     uint64_t num_cores_;
