@@ -1,6 +1,7 @@
 #include "Node.h"
 #include "Event.h"
 
+#include <algorithm>
 #include <stdexcept>
 
 double SCHEDULER_TO_TASK_TIME = 0.001;

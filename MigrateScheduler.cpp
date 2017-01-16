@@ -5,7 +5,11 @@
 namespace simulator {
 
 MigrateScheduler::MigrateScheduler(ClusterPtr c) :
-    Scheduler(c) {
+    Scheduler(c)
+{
+}
+
+void MigrateScheduler::migrateTask(JobPtr job, TaskPtr task) {
 
 }
 
@@ -15,15 +19,13 @@ void MigrateScheduler::checkStragglers(JobPtr job) {
 
     std::vector<TaskPtr> finishedTasks;
 
-    /*
-
     for (auto task : job->tasks_) {
         if (task->done_) {
             assert(task->getTaskCompletionTime() <= current_time);
             finishedTasks.push_back(task);
         }
     }
-
+    
     if (finishedTasks.size() == 0)
         return;
 
@@ -39,21 +41,15 @@ void MigrateScheduler::checkStragglers(JobPtr job) {
         LOG<INFO>("median: ", median);
        
         while (1) {
-            bool replicated = false;
             for (auto task : job->tasks_) {
-                if (false == task->replicated_ && false == task->done_ 
-                        && (current_time - task->start_time) >= 1.5 * median) {
+                if (false == task->done_ && (current_time - task->start_time) >= 1.5 * median) {
                     LOG<INFO>("Task ", task->getTaskId(), " is straggler");
                     // replicate Task
-                    replicateTask(job, task);
-                    task->replicated_ = true;
-                    replicated = true;
+                    migrateTask(job, task);
                 }
             }
-            if (!replicated)
-                break;
         }
-    }*/
+    }
 }
 
 } // namespace simulator

@@ -11,6 +11,8 @@ public:
     
     void checkStragglers(JobPtr) override;
 
+    void migrateTask(JobPtr, TaskPtr);
+
 public:
 
 };

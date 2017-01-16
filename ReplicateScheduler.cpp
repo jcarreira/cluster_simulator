@@ -5,9 +5,8 @@
 namespace simulator {
 
 ReplicateScheduler::ReplicateScheduler(ClusterPtr c) :
-    Scheduler(c) {
-
-}
+    Scheduler(c)
+{}
 
 // Spark way of dealing with stragglers
 void ReplicateScheduler::checkStragglers(JobPtr job) {
@@ -55,3 +54,4 @@ void ReplicateScheduler::checkStragglers(JobPtr job) {
 }
 
 } // namespace simulator
+

@@ -1,15 +1,13 @@
 #include "Event.h"
 #include "Log.h"
 #include "Scheduler.h"
+#include "Params.h"
 
 extern void add_to_queue(std::shared_ptr<simulator::Event> event);
 extern simulator::SchedPtr scheduler;
-extern const double STRAGGLER_TIME;
+extern simulator::Params params;
 
 #define CHECK_STRAGGLERS 1
-
-// 1 ms
-static const double TIME_TO_INFORM_SCHEDULER = 0.001;
 
 namespace simulator {
 
@@ -56,7 +54,7 @@ void EndTaskEvent::process() {
     task_->done_ = true;
 
     add_to_queue(std::make_shared<EndTaskSchedulerEvent>(
-                current_time + TIME_TO_INFORM_SCHEDULER,
+                current_time + params.nw_lat,
                 task_));
 }
 
@@ -99,7 +97,7 @@ void CheckStragglersEvent::process() {
     LOG<INFO>("NumActiveJobs: ", scheduler->getNumActiveJobs());
     if (scheduler->getNumActiveJobs()) {
         add_to_queue(std::make_shared<CheckStragglersEvent>(
-                    current_time + STRAGGLER_TIME));
+                    current_time + params.stragglers_time));
     }
 }
 

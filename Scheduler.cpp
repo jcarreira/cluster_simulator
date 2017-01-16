@@ -80,9 +80,6 @@ void Scheduler::replicateTask(JobPtr job, const TaskPtr task) {
 
     // add task to scheduler list
     scheduledTasks_[job->job_id_].push_back(task);
-    // add clone to job tasks
-    
-    //job->addTask(clone);
 
     // deploy this task in the cluster
     LOG<INFO>("replicateTask deploying task");

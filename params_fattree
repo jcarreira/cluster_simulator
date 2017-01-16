@@ -1,0 +1,13 @@
+use_migration: 0          # use migration or replication
+nw_bw: 10                 # 10Gbps
+nw_lat: 0.000001          # 1 us
+disk_bw: 100              # MB/s
+disk_lat: 0.01            # ms
+nvm_bw: 10                # Gbps
+nvm_lat: 0                # doesnt make sense
+input_task_size: 10       # GB
+output_task_size: 10      # GB
+strag_slowdown: 20        # 1.1X more than median
+strag_check_slowdown: 1.1 # 1.1 more than median
+stragglers_time: 0.1      # check every 100 ms
+avg_task_duration: 3      #
